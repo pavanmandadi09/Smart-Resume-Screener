@@ -2,6 +2,7 @@ import streamlit as st
 
 from src.resume_parser import extract_resume_text, parse_resume
 from src.skill_extractor import extract_skills
+from src.matcher import compare_skills
 
 
 # =========================================================
@@ -22,8 +23,8 @@ st.set_page_config(
 st.title("📄 Smart Resume Screener")
 
 st.write(
-    "Upload resumes and compare candidates against a job description "
-    "using AI-powered semantic matching."
+    "Upload a resume and compare the candidate against "
+    "a job description."
 )
 
 
@@ -35,7 +36,12 @@ st.header("Job Description")
 
 job_description = st.text_area(
     "Paste the job description here",
-    height=250
+    height=250,
+    placeholder=(
+        "Example:\n"
+        "We are looking for a Software Engineer with strong "
+        "Python, Java, SQL and data structures knowledge."
+    )
 )
 
 
@@ -89,9 +95,9 @@ if resume_file:
             resume_text.strip()
         ) >= 50:
 
-            # -------------------------------------------------
-            # Raw Resume Text
-            # -------------------------------------------------
+            # =================================================
+            # EXTRACTED RESUME TEXT
+            # =================================================
 
             st.subheader(
                 "Extracted Resume Text"
@@ -104,18 +110,18 @@ if resume_file:
             )
 
 
-            # -------------------------------------------------
-            # Parse Resume
-            # -------------------------------------------------
+            # =================================================
+            # PARSE RESUME
+            # =================================================
 
             resume_data = parse_resume(
                 resume_text
             )
 
 
-            # -------------------------------------------------
-            # Structured Resume
-            # -------------------------------------------------
+            # =================================================
+            # STRUCTURED RESUME
+            # =================================================
 
             st.subheader(
                 "Structured Resume"
@@ -148,6 +154,10 @@ if resume_file:
 
             with col1:
 
+                # ---------------------------------------------
+                # Personal Information
+                # ---------------------------------------------
+
                 st.write(
                     "### Personal Information"
                 )
@@ -156,6 +166,8 @@ if resume_file:
 
                 st.write(
                     resume_data["name"]
+                    if resume_data["name"]
+                    else "Not detected"
                 )
 
 
@@ -163,6 +175,8 @@ if resume_file:
 
                 st.write(
                     resume_data["email"]
+                    if resume_data["email"]
+                    else "Not detected"
                 )
 
 
@@ -170,6 +184,8 @@ if resume_file:
 
                 st.write(
                     resume_data["phone"]
+                    if resume_data["phone"]
+                    else "Not detected"
                 )
 
 
@@ -202,7 +218,9 @@ if resume_file:
                 # Education
                 # ---------------------------------------------
 
-                st.write("### Education")
+                st.write(
+                    "### Education"
+                )
 
                 if resume_data["education"]:
 
@@ -221,7 +239,9 @@ if resume_file:
                 # Experience
                 # ---------------------------------------------
 
-                st.write("### Experience")
+                st.write(
+                    "### Experience"
+                )
 
                 if resume_data["experience"]:
 
@@ -240,7 +260,9 @@ if resume_file:
                 # Projects
                 # ---------------------------------------------
 
-                st.write("### Projects")
+                st.write(
+                    "### Projects"
+                )
 
                 if resume_data["projects"]:
 
@@ -288,9 +310,9 @@ if resume_file:
             skills_col1, skills_col2 = st.columns(2)
 
 
-            # -------------------------------------------------
-            # Resume Skills
-            # -------------------------------------------------
+            # =================================================
+            # RESUME SKILLS
+            # =================================================
 
             with skills_col1:
 
@@ -318,9 +340,9 @@ if resume_file:
                     )
 
 
-            # -------------------------------------------------
-            # Job Required Skills
-            # -------------------------------------------------
+            # =================================================
+            # JOB REQUIRED SKILLS
+            # =================================================
 
             with skills_col2:
 
@@ -342,6 +364,113 @@ if resume_file:
                     st.info(
                         "No recognized skills found in job description."
                     )
+
+
+            # =================================================
+            # BASIC SKILL MATCHING
+            # =================================================
+
+            if resume_skills and job_skills:
+
+                result = compare_skills(
+                    resume_skills,
+                    job_skills
+                )
+
+
+                st.subheader(
+                    "Resume Match Analysis"
+                )
+
+
+                # -------------------------------------------------
+                # Match percentage
+                # -------------------------------------------------
+
+                st.metric(
+                    "Skill Match",
+                    f"{result['match_percentage']}%"
+                )
+
+
+                # -------------------------------------------------
+                # Progress bar
+                # -------------------------------------------------
+
+                st.progress(
+                    result["match_percentage"] / 100
+                )
+
+
+                # -------------------------------------------------
+                # Matching and missing skills
+                # -------------------------------------------------
+
+                match_col1, match_col2 = st.columns(2)
+
+
+                # =================================================
+                # MATCHING SKILLS
+                # =================================================
+
+                with match_col1:
+
+                    st.write(
+                        "### ✅ Matching Skills"
+                    )
+
+
+                    if result["matching_skills"]:
+
+                        for skill in result[
+                            "matching_skills"
+                        ]:
+
+                            st.write(
+                                f"• {skill}"
+                            )
+
+                    else:
+
+                        st.info(
+                            "No matching skills found."
+                        )
+
+
+                # =================================================
+                # MISSING SKILLS
+                # =================================================
+
+                with match_col2:
+
+                    st.write(
+                        "### ❌ Missing Skills"
+                    )
+
+
+                    if result["missing_skills"]:
+
+                        for skill in result[
+                            "missing_skills"
+                        ]:
+
+                            st.write(
+                                f"• {skill}"
+                            )
+
+                    else:
+
+                        st.success(
+                            "No major missing skills detected."
+                        )
+
+
+            elif job_description.strip():
+
+                st.warning(
+                    "Skill matching could not be performed "
+                    "because one or both skill lists are empty."
+                )
 
 
         else:
