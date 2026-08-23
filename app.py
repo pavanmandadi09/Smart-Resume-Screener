@@ -3,6 +3,7 @@ import streamlit as st
 from src.resume_parser import extract_resume_text, parse_resume
 from src.skill_extractor import extract_skills
 from src.matcher import compare_skills
+from src.llm_matcher import analyze_resume
 
 
 # =========================================================
@@ -24,7 +25,7 @@ st.title("📄 Smart Resume Screener")
 
 st.write(
     "Upload a resume and compare the candidate against "
-    "a job description."
+    "a job description using AI-powered analysis."
 )
 
 
@@ -388,14 +389,10 @@ if resume_file:
                 # -------------------------------------------------
 
                 st.metric(
-                    "Skill Match",
+                    "Keyword Skill Match",
                     f"{result['match_percentage']}%"
                 )
 
-
-                # -------------------------------------------------
-                # Progress bar
-                # -------------------------------------------------
 
                 st.progress(
                     result["match_percentage"] / 100
@@ -465,12 +462,209 @@ if resume_file:
                         )
 
 
-            elif job_description.strip():
+            # =================================================
+            # AI RESUME EVALUATION
+            # =================================================
 
-                st.warning(
-                    "Skill matching could not be performed "
-                    "because one or both skill lists are empty."
+            if job_description.strip():
+
+                st.divider()
+
+                st.header(
+                    "🤖 AI Resume Evaluation"
                 )
+
+
+                st.write(
+                    "Click the button below to perform the "
+                    "AI-powered resume evaluation."
+                )
+
+
+                # -------------------------------------------------
+                # Get Gemini API key
+                # -------------------------------------------------
+
+                api_key = st.secrets.get(
+                    "GEMINI_API_KEY",
+                    ""
+                )
+
+
+                # -------------------------------------------------
+                # Analyze Resume Button
+                # -------------------------------------------------
+
+                analyze_button = st.button(
+                    "🤖 Analyze Resume with AI",
+                    type="primary",
+                    use_container_width=True
+                )
+
+
+                if analyze_button:
+
+                    if not api_key:
+
+                        st.error(
+                            "Gemini API key is not configured. "
+                            "Please add GEMINI_API_KEY to "
+                            "Streamlit Secrets."
+                        )
+
+                    else:
+
+                        with st.spinner(
+                            "AI is analyzing the resume..."
+                        ):
+
+                            try:
+
+                                ai_result = analyze_resume(
+                                    resume_text,
+                                    job_description,
+                                    api_key
+                                )
+
+
+                                # =================================
+                                # AI SCORE
+                                # =================================
+
+                                st.subheader(
+                                    "🎯 AI Match Score"
+                                )
+
+
+                                score_col1, score_col2 = st.columns(
+                                    [1, 3]
+                                )
+
+
+                                with score_col1:
+
+                                    st.metric(
+                                        "Score",
+                                        f"{ai_result['score']} / 10"
+                                    )
+
+
+                                with score_col2:
+
+                                    st.progress(
+                                        ai_result["score"] / 10
+                                    )
+
+
+                                # =================================
+                                # AI MATCHING / MISSING SKILLS
+                                # =================================
+
+                                ai_col1, ai_col2 = st.columns(2)
+
+
+                                # ---------------------------------
+                                # AI Matching Skills
+                                # ---------------------------------
+
+                                with ai_col1:
+
+                                    st.subheader(
+                                        "✅ AI-Identified Matching Skills"
+                                    )
+
+
+                                    if ai_result[
+                                        "matching_skills"
+                                    ]:
+
+                                        for skill in ai_result[
+                                            "matching_skills"
+                                        ]:
+
+                                            st.write(
+                                                f"• {skill}"
+                                            )
+
+                                    else:
+
+                                        st.info(
+                                            "No matching skills identified."
+                                        )
+
+
+                                # ---------------------------------
+                                # AI Missing Skills
+                                # ---------------------------------
+
+                                with ai_col2:
+
+                                    st.subheader(
+                                        "❌ AI-Identified Missing Skills"
+                                    )
+
+
+                                    if ai_result[
+                                        "missing_skills"
+                                    ]:
+
+                                        for skill in ai_result[
+                                            "missing_skills"
+                                        ]:
+
+                                            st.write(
+                                                f"• {skill}"
+                                            )
+
+                                    else:
+
+                                        st.success(
+                                            "No significant missing skills identified."
+                                        )
+
+
+                                # =================================
+                                # AI JUSTIFICATION
+                                # =================================
+
+                                st.subheader(
+                                    "📝 AI Justification"
+                                )
+
+
+                                st.write(
+                                    ai_result["justification"]
+                                )
+
+
+                            except Exception as e:
+
+                                error_message = str(e)
+
+                                if (
+                                    "429" in error_message
+                                    or
+                                    "RESOURCE_EXHAUSTED"
+                                    in error_message
+                                ):
+
+                                    st.error(
+                                        "Gemini API rate limit reached. "
+                                        "Please wait and try again later."
+                                    )
+
+                                    st.info(
+                                        "Your free API tier has request "
+                                        "and token limits. The application "
+                                        "will not automatically retry the "
+                                        "request."
+                                    )
+
+                                else:
+
+                                    st.error(
+                                        f"AI analysis failed: {e}"
+                                    )
 
 
         else:
