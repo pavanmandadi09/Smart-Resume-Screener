@@ -1,7 +1,12 @@
 import streamlit as st
 
 from src.resume_parser import extract_resume_text, parse_resume
+from src.skill_extractor import extract_skills
 
+
+# =========================================================
+# PAGE CONFIGURATION
+# =========================================================
 
 st.set_page_config(
     page_title="Smart Resume Screener",
@@ -9,6 +14,10 @@ st.set_page_config(
     layout="wide"
 )
 
+
+# =========================================================
+# APPLICATION TITLE
+# =========================================================
 
 st.title("📄 Smart Resume Screener")
 
@@ -18,6 +27,10 @@ st.write(
 )
 
 
+# =========================================================
+# JOB DESCRIPTION
+# =========================================================
+
 st.header("Job Description")
 
 job_description = st.text_area(
@@ -25,6 +38,23 @@ job_description = st.text_area(
     height=250
 )
 
+
+# =========================================================
+# JOB SKILL EXTRACTION
+# =========================================================
+
+job_skills = []
+
+if job_description.strip():
+
+    job_skills = extract_skills(
+        job_description
+    )
+
+
+# =========================================================
+# RESUME UPLOAD
+# =========================================================
 
 st.header("Upload Resume")
 
@@ -34,21 +64,38 @@ resume_file = st.file_uploader(
 )
 
 
+# =========================================================
+# RESUME PROCESSING
+# =========================================================
+
 if resume_file:
 
-    st.success(f"Uploaded: {resume_file.name}")
+    st.success(
+        f"Uploaded: {resume_file.name}"
+    )
 
     try:
 
-        resume_text = extract_resume_text(resume_file)
+        # -------------------------------------------------
+        # Extract resume text
+        # -------------------------------------------------
 
-        if resume_text and len(resume_text.strip()) >= 50:
+        resume_text = extract_resume_text(
+            resume_file
+        )
 
-            # ---------------------------------
+
+        if resume_text and len(
+            resume_text.strip()
+        ) >= 50:
+
+            # -------------------------------------------------
             # Raw Resume Text
-            # ---------------------------------
+            # -------------------------------------------------
 
-            st.subheader("Extracted Resume Text")
+            st.subheader(
+                "Extracted Resume Text"
+            )
 
             st.text_area(
                 "Resume Content",
@@ -57,57 +104,244 @@ if resume_file:
             )
 
 
-            # ---------------------------------
+            # -------------------------------------------------
+            # Parse Resume
+            # -------------------------------------------------
+
+            resume_data = parse_resume(
+                resume_text
+            )
+
+
+            # -------------------------------------------------
             # Structured Resume
-            # ---------------------------------
+            # -------------------------------------------------
 
-            resume_data = parse_resume(resume_text)
+            st.subheader(
+                "Structured Resume"
+            )
 
-            st.subheader("Structured Resume")
 
+            # -------------------------------------------------
+            # Profile
+            # -------------------------------------------------
+
+            if resume_data["profile"]:
+
+                st.write("### Profile")
+
+                st.write(
+                    resume_data["profile"]
+                )
+
+
+            # -------------------------------------------------
+            # Two-column layout
+            # -------------------------------------------------
 
             col1, col2 = st.columns(2)
 
 
+            # =================================================
+            # LEFT COLUMN
+            # =================================================
+
             with col1:
 
-                st.write("### Personal Information")
+                st.write(
+                    "### Personal Information"
+                )
 
                 st.write("**Name**")
-                st.write(resume_data["name"])
+
+                st.write(
+                    resume_data["name"]
+                )
+
 
                 st.write("**Email**")
-                st.write(resume_data["email"])
+
+                st.write(
+                    resume_data["email"]
+                )
+
 
                 st.write("**Phone**")
-                st.write(resume_data["phone"])
 
+                st.write(
+                    resume_data["phone"]
+                )
+
+
+                # ---------------------------------------------
+                # Skills
+                # ---------------------------------------------
 
                 st.write("### Skills")
 
-                st.write(resume_data["skills"])
+                if resume_data["skills"]:
 
+                    st.write(
+                        resume_data["skills"]
+                    )
+
+                else:
+
+                    st.info(
+                        "No skills section detected."
+                    )
+
+
+            # =================================================
+            # RIGHT COLUMN
+            # =================================================
 
             with col2:
 
+                # ---------------------------------------------
+                # Education
+                # ---------------------------------------------
+
                 st.write("### Education")
 
-                st.write(resume_data["education"])
+                if resume_data["education"]:
 
+                    st.write(
+                        resume_data["education"]
+                    )
+
+                else:
+
+                    st.info(
+                        "No education section detected."
+                    )
+
+
+                # ---------------------------------------------
+                # Experience
+                # ---------------------------------------------
 
                 st.write("### Experience")
 
-                st.write(resume_data["experience"])
+                if resume_data["experience"]:
 
+                    st.write(
+                        resume_data["experience"]
+                    )
+
+                else:
+
+                    st.info(
+                        "No experience section detected."
+                    )
+
+
+                # ---------------------------------------------
+                # Projects
+                # ---------------------------------------------
 
                 st.write("### Projects")
 
-                st.write(resume_data["projects"])
+                if resume_data["projects"]:
+
+                    st.write(
+                        resume_data["projects"]
+                    )
+
+                else:
+
+                    st.info(
+                        "No projects section detected."
+                    )
 
 
-                st.write("### Certifications")
+                # ---------------------------------------------
+                # Certifications
+                # ---------------------------------------------
 
-                st.write(resume_data["certifications"])
+                st.write(
+                    "### Certifications"
+                )
+
+                if resume_data["certifications"]:
+
+                    st.write(
+                        resume_data["certifications"]
+                    )
+
+                else:
+
+                    st.info(
+                        "No certifications section detected."
+                    )
+
+
+            # =================================================
+            # DETECTED SKILLS
+            # =================================================
+
+            st.subheader(
+                "Detected Skills"
+            )
+
+
+            skills_col1, skills_col2 = st.columns(2)
+
+
+            # -------------------------------------------------
+            # Resume Skills
+            # -------------------------------------------------
+
+            with skills_col1:
+
+                st.write(
+                    "### Resume Skills"
+                )
+
+                resume_skills = extract_skills(
+                    resume_data["skills"]
+                )
+
+
+                if resume_skills:
+
+                    for skill in resume_skills:
+
+                        st.write(
+                            f"• {skill}"
+                        )
+
+                else:
+
+                    st.info(
+                        "No recognized skills found in resume."
+                    )
+
+
+            # -------------------------------------------------
+            # Job Required Skills
+            # -------------------------------------------------
+
+            with skills_col2:
+
+                st.write(
+                    "### Job Required Skills"
+                )
+
+
+                if job_skills:
+
+                    for skill in job_skills:
+
+                        st.write(
+                            f"• {skill}"
+                        )
+
+                else:
+
+                    st.info(
+                        "No recognized skills found in job description."
+                    )
 
 
         else:
