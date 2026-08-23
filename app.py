@@ -18,6 +18,31 @@ st.set_page_config(
 
 
 # =========================================================
+# HELPER FUNCTION - RECOMMENDATION
+# =========================================================
+
+def get_recommendation(score):
+    """
+    Convert the AI score into a recruiter-friendly
+    recommendation.
+    """
+
+    if score >= 9:
+        return "🟢 Strong Match"
+
+    if score >= 7:
+        return "🟢 Good Match"
+
+    if score >= 5:
+        return "🟡 Moderate Match"
+
+    if score >= 3:
+        return "🟠 Weak Match"
+
+    return "🔴 Poor Match"
+
+
+# =========================================================
 # APPLICATION TITLE
 # =========================================================
 
@@ -201,10 +226,6 @@ if resume_file:
 
                 with col1:
 
-                    # ---------------------------------------------
-                    # Skills
-                    # ---------------------------------------------
-
                     st.write(
                         "### Skills"
                     )
@@ -221,10 +242,6 @@ if resume_file:
                             "No skills section detected."
                         )
 
-
-                    # ---------------------------------------------
-                    # Education
-                    # ---------------------------------------------
 
                     st.write(
                         "### Education"
@@ -249,10 +266,6 @@ if resume_file:
 
                 with col2:
 
-                    # ---------------------------------------------
-                    # Experience
-                    # ---------------------------------------------
-
                     st.write(
                         "### Experience"
                     )
@@ -270,10 +283,6 @@ if resume_file:
                         )
 
 
-                    # ---------------------------------------------
-                    # Projects
-                    # ---------------------------------------------
-
                     st.write(
                         "### Projects"
                     )
@@ -290,10 +299,6 @@ if resume_file:
                             "No projects section detected."
                         )
 
-
-                    # ---------------------------------------------
-                    # Certifications
-                    # ---------------------------------------------
 
                     st.write(
                         "### Certifications"
@@ -313,7 +318,7 @@ if resume_file:
 
 
             # =================================================
-            # DETECTED SKILLS
+            # SKILL ANALYSIS
             # =================================================
 
             st.header(
@@ -381,10 +386,11 @@ if resume_file:
 
 
             # =================================================
-            # BASIC SKILL MATCHING
+            # BASIC KEYWORD MATCHING
             # =================================================
 
             basic_result = None
+
 
             if resume_skills and job_skills:
 
@@ -399,19 +405,22 @@ if resume_file:
                 )
 
 
-                # -------------------------------------------------
-                # Match percentage
-                # -------------------------------------------------
-
-                st.metric(
-                    "Keyword Skill Match",
-                    f"{basic_result['match_percentage']}%"
-                )
+                metric_col1, metric_col2 = st.columns(2)
 
 
-                st.progress(
-                    basic_result["match_percentage"] / 100
-                )
+                with metric_col1:
+
+                    st.metric(
+                        "Keyword Skill Match",
+                        f"{basic_result['match_percentage']}%"
+                    )
+
+
+                with metric_col2:
+
+                    st.progress(
+                        basic_result["match_percentage"] / 100
+                    )
 
 
                 match_col1, match_col2 = st.columns(2)
@@ -481,9 +490,6 @@ if resume_file:
             # AI RESUME EVALUATION
             # =================================================
 
-            ai_result = None
-
-
             if job_description.strip():
 
                 st.divider()
@@ -491,7 +497,6 @@ if resume_file:
                 st.header(
                     "🤖 AI Resume Evaluation"
                 )
-
 
                 st.write(
                     "Use Gemini AI to perform a semantic evaluation "
@@ -544,7 +549,6 @@ if resume_file:
                                 )
 
 
-                                # Store result in session state
                                 st.session_state[
                                     "ai_result"
                                 ] = ai_result
@@ -581,14 +585,9 @@ if resume_file:
                 # Retrieve previous AI result
                 # -------------------------------------------------
 
-                if (
+                ai_result = st.session_state.get(
                     "ai_result"
-                    in st.session_state
-                ):
-
-                    ai_result = st.session_state[
-                        "ai_result"
-                    ]
+                )
 
 
                 # =================================================
@@ -597,28 +596,42 @@ if resume_file:
 
                 if ai_result:
 
+                    score = ai_result["score"]
+
+                    recommendation = get_recommendation(
+                        score
+                    )
+
+
+                    # =================================================
+                    # SCORE + RECOMMENDATION
+                    # =================================================
+
                     st.subheader(
-                        "🎯 AI Match Score"
+                        "🎯 Final Candidate Assessment"
                     )
 
 
-                    score_col1, score_col2 = st.columns(
-                        [1, 3]
-                    )
+                    score_col1, score_col2 = st.columns(2)
 
 
                     with score_col1:
 
                         st.metric(
-                            "AI Score",
-                            f"{ai_result['score']} / 10"
+                            "AI Match Score",
+                            f"{score} / 10"
+                        )
+
+                        st.progress(
+                            score / 10
                         )
 
 
                     with score_col2:
 
-                        st.progress(
-                            ai_result["score"] / 10
+                        st.metric(
+                            "Recruiter Recommendation",
+                            recommendation
                         )
 
 
@@ -630,7 +643,7 @@ if resume_file:
 
 
                     # -------------------------------------------------
-                    # Matching skills
+                    # AI Matching Skills
                     # -------------------------------------------------
 
                     with ai_col1:
@@ -660,7 +673,7 @@ if resume_file:
 
 
                     # -------------------------------------------------
-                    # Missing skills
+                    # AI Missing Skills
                     # -------------------------------------------------
 
                     with ai_col2:
@@ -697,14 +710,13 @@ if resume_file:
                         "📝 AI Justification"
                     )
 
-
                     st.write(
                         ai_result["justification"]
                     )
 
 
                     # =================================================
-                    # DOWNLOAD SCREENING REPORT
+                    # SCREENING REPORT
                     # =================================================
 
                     st.divider()
@@ -748,7 +760,6 @@ if resume_file:
 
                     report.append("")
 
-
                     report.append(
                         "JOB DESCRIPTION"
                     )
@@ -762,7 +773,6 @@ if resume_file:
                     )
 
                     report.append("")
-
 
                     report.append(
                         "DETECTED RESUME SKILLS"
@@ -780,6 +790,10 @@ if resume_file:
 
                     report.append("")
 
+
+                    # =================================================
+                    # KEYWORD MATCH REPORT
+                    # =================================================
 
                     if basic_result:
 
@@ -827,6 +841,10 @@ if resume_file:
                         report.append("")
 
 
+                    # =================================================
+                    # AI REPORT
+                    # =================================================
+
                     report.append(
                         "AI RESUME EVALUATION"
                     )
@@ -836,8 +854,11 @@ if resume_file:
                     )
 
                     report.append(
-                        f"AI Match Score: "
-                        f"{ai_result['score']} / 10"
+                        f"AI Match Score: {score} / 10"
+                    )
+
+                    report.append(
+                        f"Recommendation: {recommendation}"
                     )
 
                     report.append("")
@@ -893,6 +914,10 @@ if resume_file:
                         report
                     )
 
+
+                    # =================================================
+                    # DOWNLOAD REPORT
+                    # =================================================
 
                     st.download_button(
                         label="⬇️ Download Screening Report",
