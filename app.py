@@ -41,7 +41,9 @@ job_description = st.text_area(
     placeholder=(
         "Example:\n"
         "We are looking for a Software Engineer with strong "
-        "Python, Java, SQL and data structures knowledge."
+        "Python, Java, SQL and data structures knowledge.\n\n"
+        "Candidates should have experience with machine learning, "
+        "REST APIs, Git and software development."
     )
 )
 
@@ -100,15 +102,15 @@ if resume_file:
             # EXTRACTED RESUME TEXT
             # =================================================
 
-            st.subheader(
-                "Extracted Resume Text"
-            )
+            with st.expander(
+                "📄 View Extracted Resume Text"
+            ):
 
-            st.text_area(
-                "Resume Content",
-                resume_text,
-                height=400
-            )
+                st.text_area(
+                    "Resume Content",
+                    resume_text,
+                    height=400
+                )
 
 
             # =================================================
@@ -121,47 +123,20 @@ if resume_file:
 
 
             # =================================================
-            # STRUCTURED RESUME
+            # CANDIDATE SUMMARY
             # =================================================
 
-            st.subheader(
-                "Structured Resume"
+            st.header(
+                "👤 Candidate Summary"
             )
 
 
-            # -------------------------------------------------
-            # Profile
-            # -------------------------------------------------
-
-            if resume_data["profile"]:
-
-                st.write("### Profile")
-
-                st.write(
-                    resume_data["profile"]
-                )
+            summary_col1, summary_col2, summary_col3 = st.columns(
+                3
+            )
 
 
-            # -------------------------------------------------
-            # Two-column layout
-            # -------------------------------------------------
-
-            col1, col2 = st.columns(2)
-
-
-            # =================================================
-            # LEFT COLUMN
-            # =================================================
-
-            with col1:
-
-                # ---------------------------------------------
-                # Personal Information
-                # ---------------------------------------------
-
-                st.write(
-                    "### Personal Information"
-                )
+            with summary_col1:
 
                 st.write("**Name**")
 
@@ -172,6 +147,8 @@ if resume_file:
                 )
 
 
+            with summary_col2:
+
                 st.write("**Email**")
 
                 st.write(
@@ -180,6 +157,8 @@ if resume_file:
                     else "Not detected"
                 )
 
+
+            with summary_col3:
 
                 st.write("**Phone**")
 
@@ -190,121 +169,155 @@ if resume_file:
                 )
 
 
-                # ---------------------------------------------
-                # Skills
-                # ---------------------------------------------
+            # =================================================
+            # PROFILE
+            # =================================================
 
-                st.write("### Skills")
+            if resume_data["profile"]:
 
-                if resume_data["skills"]:
+                st.subheader(
+                    "Profile"
+                )
 
-                    st.write(
-                        resume_data["skills"]
-                    )
-
-                else:
-
-                    st.info(
-                        "No skills section detected."
-                    )
+                st.write(
+                    resume_data["profile"]
+                )
 
 
             # =================================================
-            # RIGHT COLUMN
+            # STRUCTURED RESUME
             # =================================================
 
-            with col2:
+            with st.expander(
+                "📋 View Structured Resume"
+            ):
 
-                # ---------------------------------------------
-                # Education
-                # ---------------------------------------------
-
-                st.write(
-                    "### Education"
-                )
-
-                if resume_data["education"]:
-
-                    st.write(
-                        resume_data["education"]
-                    )
-
-                else:
-
-                    st.info(
-                        "No education section detected."
-                    )
+                col1, col2 = st.columns(2)
 
 
-                # ---------------------------------------------
-                # Experience
-                # ---------------------------------------------
+                # =================================================
+                # LEFT COLUMN
+                # =================================================
 
-                st.write(
-                    "### Experience"
-                )
+                with col1:
 
-                if resume_data["experience"]:
+                    # ---------------------------------------------
+                    # Skills
+                    # ---------------------------------------------
 
                     st.write(
-                        resume_data["experience"]
+                        "### Skills"
                     )
 
-                else:
+                    if resume_data["skills"]:
 
-                    st.info(
-                        "No experience section detected."
-                    )
+                        st.write(
+                            resume_data["skills"]
+                        )
+
+                    else:
+
+                        st.info(
+                            "No skills section detected."
+                        )
 
 
-                # ---------------------------------------------
-                # Projects
-                # ---------------------------------------------
-
-                st.write(
-                    "### Projects"
-                )
-
-                if resume_data["projects"]:
+                    # ---------------------------------------------
+                    # Education
+                    # ---------------------------------------------
 
                     st.write(
-                        resume_data["projects"]
+                        "### Education"
                     )
 
-                else:
+                    if resume_data["education"]:
 
-                    st.info(
-                        "No projects section detected."
-                    )
+                        st.write(
+                            resume_data["education"]
+                        )
+
+                    else:
+
+                        st.info(
+                            "No education section detected."
+                        )
 
 
-                # ---------------------------------------------
-                # Certifications
-                # ---------------------------------------------
+                # =================================================
+                # RIGHT COLUMN
+                # =================================================
 
-                st.write(
-                    "### Certifications"
-                )
+                with col2:
 
-                if resume_data["certifications"]:
+                    # ---------------------------------------------
+                    # Experience
+                    # ---------------------------------------------
 
                     st.write(
-                        resume_data["certifications"]
+                        "### Experience"
                     )
 
-                else:
+                    if resume_data["experience"]:
 
-                    st.info(
-                        "No certifications section detected."
+                        st.write(
+                            resume_data["experience"]
+                        )
+
+                    else:
+
+                        st.info(
+                            "No experience section detected."
+                        )
+
+
+                    # ---------------------------------------------
+                    # Projects
+                    # ---------------------------------------------
+
+                    st.write(
+                        "### Projects"
                     )
+
+                    if resume_data["projects"]:
+
+                        st.write(
+                            resume_data["projects"]
+                        )
+
+                    else:
+
+                        st.info(
+                            "No projects section detected."
+                        )
+
+
+                    # ---------------------------------------------
+                    # Certifications
+                    # ---------------------------------------------
+
+                    st.write(
+                        "### Certifications"
+                    )
+
+                    if resume_data["certifications"]:
+
+                        st.write(
+                            resume_data["certifications"]
+                        )
+
+                    else:
+
+                        st.info(
+                            "No certifications section detected."
+                        )
 
 
             # =================================================
             # DETECTED SKILLS
             # =================================================
 
-            st.subheader(
-                "Detected Skills"
+            st.header(
+                "🛠️ Skill Analysis"
             )
 
 
@@ -317,8 +330,8 @@ if resume_file:
 
             with skills_col1:
 
-                st.write(
-                    "### Resume Skills"
+                st.subheader(
+                    "Resume Skills"
                 )
 
                 resume_skills = extract_skills(
@@ -347,8 +360,8 @@ if resume_file:
 
             with skills_col2:
 
-                st.write(
-                    "### Job Required Skills"
+                st.subheader(
+                    "Job Required Skills"
                 )
 
 
@@ -371,16 +384,18 @@ if resume_file:
             # BASIC SKILL MATCHING
             # =================================================
 
+            basic_result = None
+
             if resume_skills and job_skills:
 
-                result = compare_skills(
+                basic_result = compare_skills(
                     resume_skills,
                     job_skills
                 )
 
 
                 st.subheader(
-                    "Resume Match Analysis"
+                    "📊 Keyword Match Analysis"
                 )
 
 
@@ -390,18 +405,14 @@ if resume_file:
 
                 st.metric(
                     "Keyword Skill Match",
-                    f"{result['match_percentage']}%"
+                    f"{basic_result['match_percentage']}%"
                 )
 
 
                 st.progress(
-                    result["match_percentage"] / 100
+                    basic_result["match_percentage"] / 100
                 )
 
-
-                # -------------------------------------------------
-                # Matching and missing skills
-                # -------------------------------------------------
 
                 match_col1, match_col2 = st.columns(2)
 
@@ -417,9 +428,11 @@ if resume_file:
                     )
 
 
-                    if result["matching_skills"]:
+                    if basic_result[
+                        "matching_skills"
+                    ]:
 
-                        for skill in result[
+                        for skill in basic_result[
                             "matching_skills"
                         ]:
 
@@ -445,9 +458,11 @@ if resume_file:
                     )
 
 
-                    if result["missing_skills"]:
+                    if basic_result[
+                        "missing_skills"
+                    ]:
 
-                        for skill in result[
+                        for skill in basic_result[
                             "missing_skills"
                         ]:
 
@@ -466,6 +481,9 @@ if resume_file:
             # AI RESUME EVALUATION
             # =================================================
 
+            ai_result = None
+
+
             if job_description.strip():
 
                 st.divider()
@@ -476,13 +494,13 @@ if resume_file:
 
 
                 st.write(
-                    "Click the button below to perform the "
-                    "AI-powered resume evaluation."
+                    "Use Gemini AI to perform a semantic evaluation "
+                    "of the candidate against the job description."
                 )
 
 
                 # -------------------------------------------------
-                # Get Gemini API key
+                # Gemini API key
                 # -------------------------------------------------
 
                 api_key = st.secrets.get(
@@ -492,7 +510,7 @@ if resume_file:
 
 
                 # -------------------------------------------------
-                # Analyze Resume Button
+                # Analyze button
                 # -------------------------------------------------
 
                 analyze_button = st.button(
@@ -508,8 +526,7 @@ if resume_file:
 
                         st.error(
                             "Gemini API key is not configured. "
-                            "Please add GEMINI_API_KEY to "
-                            "Streamlit Secrets."
+                            "Please add GEMINI_API_KEY to Streamlit Secrets."
                         )
 
                     else:
@@ -527,119 +544,16 @@ if resume_file:
                                 )
 
 
-                                # =================================
-                                # AI SCORE
-                                # =================================
-
-                                st.subheader(
-                                    "🎯 AI Match Score"
-                                )
-
-
-                                score_col1, score_col2 = st.columns(
-                                    [1, 3]
-                                )
-
-
-                                with score_col1:
-
-                                    st.metric(
-                                        "Score",
-                                        f"{ai_result['score']} / 10"
-                                    )
-
-
-                                with score_col2:
-
-                                    st.progress(
-                                        ai_result["score"] / 10
-                                    )
-
-
-                                # =================================
-                                # AI MATCHING / MISSING SKILLS
-                                # =================================
-
-                                ai_col1, ai_col2 = st.columns(2)
-
-
-                                # ---------------------------------
-                                # AI Matching Skills
-                                # ---------------------------------
-
-                                with ai_col1:
-
-                                    st.subheader(
-                                        "✅ AI-Identified Matching Skills"
-                                    )
-
-
-                                    if ai_result[
-                                        "matching_skills"
-                                    ]:
-
-                                        for skill in ai_result[
-                                            "matching_skills"
-                                        ]:
-
-                                            st.write(
-                                                f"• {skill}"
-                                            )
-
-                                    else:
-
-                                        st.info(
-                                            "No matching skills identified."
-                                        )
-
-
-                                # ---------------------------------
-                                # AI Missing Skills
-                                # ---------------------------------
-
-                                with ai_col2:
-
-                                    st.subheader(
-                                        "❌ AI-Identified Missing Skills"
-                                    )
-
-
-                                    if ai_result[
-                                        "missing_skills"
-                                    ]:
-
-                                        for skill in ai_result[
-                                            "missing_skills"
-                                        ]:
-
-                                            st.write(
-                                                f"• {skill}"
-                                            )
-
-                                    else:
-
-                                        st.success(
-                                            "No significant missing skills identified."
-                                        )
-
-
-                                # =================================
-                                # AI JUSTIFICATION
-                                # =================================
-
-                                st.subheader(
-                                    "📝 AI Justification"
-                                )
-
-
-                                st.write(
-                                    ai_result["justification"]
-                                )
+                                # Store result in session state
+                                st.session_state[
+                                    "ai_result"
+                                ] = ai_result
 
 
                             except Exception as e:
 
                                 error_message = str(e)
+
 
                                 if (
                                     "429" in error_message
@@ -649,15 +563,11 @@ if resume_file:
                                 ):
 
                                     st.error(
-                                        "Gemini API rate limit reached. "
-                                        "Please wait and try again later."
+                                        "Gemini API rate limit reached."
                                     )
 
                                     st.info(
-                                        "Your free API tier has request "
-                                        "and token limits. The application "
-                                        "will not automatically retry the "
-                                        "request."
+                                        "Please wait before trying again."
                                     )
 
                                 else:
@@ -665,6 +575,334 @@ if resume_file:
                                     st.error(
                                         f"AI analysis failed: {e}"
                                     )
+
+
+                # -------------------------------------------------
+                # Retrieve previous AI result
+                # -------------------------------------------------
+
+                if (
+                    "ai_result"
+                    in st.session_state
+                ):
+
+                    ai_result = st.session_state[
+                        "ai_result"
+                    ]
+
+
+                # =================================================
+                # DISPLAY AI RESULT
+                # =================================================
+
+                if ai_result:
+
+                    st.subheader(
+                        "🎯 AI Match Score"
+                    )
+
+
+                    score_col1, score_col2 = st.columns(
+                        [1, 3]
+                    )
+
+
+                    with score_col1:
+
+                        st.metric(
+                            "AI Score",
+                            f"{ai_result['score']} / 10"
+                        )
+
+
+                    with score_col2:
+
+                        st.progress(
+                            ai_result["score"] / 10
+                        )
+
+
+                    # =================================================
+                    # AI MATCHING / MISSING SKILLS
+                    # =================================================
+
+                    ai_col1, ai_col2 = st.columns(2)
+
+
+                    # -------------------------------------------------
+                    # Matching skills
+                    # -------------------------------------------------
+
+                    with ai_col1:
+
+                        st.subheader(
+                            "✅ AI Matching Skills"
+                        )
+
+
+                        if ai_result[
+                            "matching_skills"
+                        ]:
+
+                            for skill in ai_result[
+                                "matching_skills"
+                            ]:
+
+                                st.write(
+                                    f"• {skill}"
+                                )
+
+                        else:
+
+                            st.info(
+                                "No matching skills identified."
+                            )
+
+
+                    # -------------------------------------------------
+                    # Missing skills
+                    # -------------------------------------------------
+
+                    with ai_col2:
+
+                        st.subheader(
+                            "❌ AI Missing Skills"
+                        )
+
+
+                        if ai_result[
+                            "missing_skills"
+                        ]:
+
+                            for skill in ai_result[
+                                "missing_skills"
+                            ]:
+
+                                st.write(
+                                    f"• {skill}"
+                                )
+
+                        else:
+
+                            st.success(
+                                "No significant missing skills identified."
+                            )
+
+
+                    # =================================================
+                    # AI JUSTIFICATION
+                    # =================================================
+
+                    st.subheader(
+                        "📝 AI Justification"
+                    )
+
+
+                    st.write(
+                        ai_result["justification"]
+                    )
+
+
+                    # =================================================
+                    # DOWNLOAD SCREENING REPORT
+                    # =================================================
+
+                    st.divider()
+
+                    st.subheader(
+                        "📄 Screening Report"
+                    )
+
+
+                    report = []
+
+                    report.append(
+                        "SMART RESUME SCREENER"
+                    )
+
+                    report.append(
+                        "=" * 60
+                    )
+
+                    report.append("")
+
+                    report.append(
+                        "CANDIDATE INFORMATION"
+                    )
+
+                    report.append(
+                        "-" * 60
+                    )
+
+                    report.append(
+                        f"Name: {resume_data['name'] or 'Not detected'}"
+                    )
+
+                    report.append(
+                        f"Email: {resume_data['email'] or 'Not detected'}"
+                    )
+
+                    report.append(
+                        f"Phone: {resume_data['phone'] or 'Not detected'}"
+                    )
+
+                    report.append("")
+
+
+                    report.append(
+                        "JOB DESCRIPTION"
+                    )
+
+                    report.append(
+                        "-" * 60
+                    )
+
+                    report.append(
+                        job_description
+                    )
+
+                    report.append("")
+
+
+                    report.append(
+                        "DETECTED RESUME SKILLS"
+                    )
+
+                    report.append(
+                        "-" * 60
+                    )
+
+                    for skill in resume_skills:
+
+                        report.append(
+                            f"- {skill}"
+                        )
+
+                    report.append("")
+
+
+                    if basic_result:
+
+                        report.append(
+                            "KEYWORD MATCH ANALYSIS"
+                        )
+
+                        report.append(
+                            "-" * 60
+                        )
+
+                        report.append(
+                            f"Keyword Match: "
+                            f"{basic_result['match_percentage']}%"
+                        )
+
+                        report.append("")
+
+                        report.append(
+                            "Matching Skills:"
+                        )
+
+                        for skill in basic_result[
+                            "matching_skills"
+                        ]:
+
+                            report.append(
+                                f"- {skill}"
+                            )
+
+                        report.append("")
+
+                        report.append(
+                            "Missing Skills:"
+                        )
+
+                        for skill in basic_result[
+                            "missing_skills"
+                        ]:
+
+                            report.append(
+                                f"- {skill}"
+                            )
+
+                        report.append("")
+
+
+                    report.append(
+                        "AI RESUME EVALUATION"
+                    )
+
+                    report.append(
+                        "-" * 60
+                    )
+
+                    report.append(
+                        f"AI Match Score: "
+                        f"{ai_result['score']} / 10"
+                    )
+
+                    report.append("")
+
+                    report.append(
+                        "AI Matching Skills:"
+                    )
+
+                    for skill in ai_result[
+                        "matching_skills"
+                    ]:
+
+                        report.append(
+                            f"- {skill}"
+                        )
+
+                    report.append("")
+
+                    report.append(
+                        "AI Missing Skills:"
+                    )
+
+                    for skill in ai_result[
+                        "missing_skills"
+                    ]:
+
+                        report.append(
+                            f"- {skill}"
+                        )
+
+                    report.append("")
+
+                    report.append(
+                        "AI Justification:"
+                    )
+
+                    report.append(
+                        ai_result["justification"]
+                    )
+
+                    report.append("")
+
+                    report.append(
+                        "=" * 60
+                    )
+
+                    report.append(
+                        "Generated by Smart Resume Screener"
+                    )
+
+
+                    report_text = "\n".join(
+                        report
+                    )
+
+
+                    st.download_button(
+                        label="⬇️ Download Screening Report",
+                        data=report_text,
+                        file_name=(
+                            "resume_screening_report.txt"
+                        ),
+                        mime="text/plain",
+                        use_container_width=True
+                    )
 
 
         else:
